@@ -105,6 +105,6 @@ const toggleAccentsOnTab = (id) => {
     });
   }
 }
+chrome.browserAction.onClicked.addListener(function(tab) { run()});
 
 setListeners();
-initializeToken();

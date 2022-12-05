@@ -42,14 +42,13 @@ function tagWordAccent(word, tokenizer) {
  
   if(!dictEntry) {
     let token = tokenizer.tokenize(word);
-    let forms = token.basic_form;
-    console.log(word)
-    return forms
+    return token
+      .filter(form => form.word_type != "UNKNOWN")
       .map(form => {
         let basicForm = form.basic_form
         dictEntry = getDictionnaryEntryFromKanji(basicForm) || getDictionnaryEntryFromPronunciation(basicForm);
         if(!dictEntry) return `<span>${word}</span>`;
-        return formatHtml(basicForm, dictEntry.pronunciation, pitchMora)
+        return formatHtml(basicForm, dictEntry.pronunciation, dictEntry.pitchMora[0][0])
       })
       .join("")
   }
@@ -101,15 +100,17 @@ function markTextAccents (element) {
   let paragraphs = document.getElementsByTagName('b');
   
   initializeToken().build(function (err, tokenizer) {
+    console.log("initializing tokenizer")
     for(var i = 0; i < paragraphs.length; i++) {
         let tokens = tokenize(paragraphs[i].textContent);
 
         let newHtml = ''
         for(var j = 0; j < tokens.length; j++)
         {
-          console.log(tokens[j])
+          if(tokens[j][1].startsWith('N') || tokens[j][1].startsWith('R') || tokens[j][1].startsWith('V')) 
+            console.log(tokens[j])
           //If the token is a noun
-          if(tokens[j][1].startsWith('N') || tokens[j][1].startsWith('R') || tokens[j][1].startsWith('V') || tokens[j][1].startsWith('R'))
+          if(tokens[j][1].startsWith('N') || tokens[j][1].startsWith('R') || tokens[j][1].startsWith('V'))
             newHtml += tagWordAccent(tokens[j][0], tokenizer);
           else if(!tokens[j][1].startsWith('W'))
             newHtml += tokens[j][0]
@@ -133,12 +134,15 @@ function removeTextAccents() {
   }
 }
 
-chrome.storage.onChanged.addListener(function(changes) {
-  console.log("ds");
-  if ('showAccents' in changes && changes.showAccents.newValue === true) {
-    removeFurigana();
+// chrome.storage.onChanged.addListener(function(changes) {
+//   console.log("ds");
+//   if ('showAccents' in changes && changes.showAccents.newValue === true) {
+//     removeFurigana();
+//     markTextAccents();
+//   } else {
+//     removeTextAccents();
+//   }
+// });
+document.body.onload = function run() {
     markTextAccents();
-  } else {
-    removeTextAccents();
-  }
-});
+}
