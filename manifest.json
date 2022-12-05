@@ -1,0 +1,37 @@
+{
+	"manifest_version": 2,
+
+	"name": "akusento",
+	"version": "0.0.1",
+	"author": "Étienne Plante",
+	"description": "Colors japanese words according to their pitch accent",
+
+	"permissions": ["storage", "*://*/*",
+    "activeTab",
+    "tabs",
+    "background"],
+
+	"icons": { 
+		"48": "images/icon48.png",
+		"128": "images/icon128.png" 
+	},
+
+	"browser_action": {
+    "default_icon": "images/icon48.png"
+	},
+	
+	"background": {
+		"scripts": ["src/background.js"]
+	},
+	
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"css": ["src/pitch_color.css"]
+		}
+	],
+
+	"web_accessible_resources": [
+		"/kuromoji/dict/*"
+	]
+}
